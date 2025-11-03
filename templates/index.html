@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      background: #34495e;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background: #27ae60;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #219150;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table th, table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    table th {
+      background: #2c3e50;
+      color: white;
+    }
+
+    a.btn {
+      background: #e74c3c;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    a.btn:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📚 Library Management System</h1>
+  </header>
+
+  <nav>
+    <a href="#add-member">Add Member</a>
+    <a href="#books">Books</a>
+    <a href="#issue-book">Issue Book</a>
+    <a href="#issued-list">Issued Books</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- Add Member -->
+    <div id="add-member" class="card">
+      <h2>Add Member</h2>
+      <form action="/add_member" method="POST">
+        <input type="text" name="name" placeholder="Member Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="phone" placeholder="Phone" required>
+        <button type="submit">Add Member</button>
+      </form>
+
+      <h3>Members List</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Member ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <td>{{ m.member_id }}</td>
+            <td>{{ m.name }}</td>
+            <td>{{ m.email }}</td>
+            <td>{{ m.phone }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Book & Books List -->
+    <div id="books" class="card">
+      <h2>Add Book</h2>
+      <form action="/add_book" method="POST">
+        <input type="text" name="title" placeholder="Book Title" required>
+        <input type="text" name="author" placeholder="Author Name" required>
+        <input type="number" name="copies" placeholder="Number of Copies" min="1" required>
+        <button type="submit">Add Book</button>
+      </form>
+
+      <h3>Books List</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Available Copies</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in books %}
+          <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.title }}</td>
+            <td>{{ b.author }}</td>
+            <td>{{ b.copies }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Issue Book -->
+    <div id="issue-book" class="card">
+      <h2>Issue Book</h2>
+      <form action="/issue_book" method="POST">
+        <input type="text" name="member_id" placeholder="Enter Member ID (e.g., M001)" required>
+        <input type="text" name="book_id" placeholder="Enter Book ID (e.g., 1)" required>
+        <button type="submit">Issue Book</button>
+      </form>
+    </div>
+
+    <!-- Issued Books -->
+    <div id="issued-list" class="card">
+      <h2>Issued Books</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Member Name</th>
+            <th>Book Title</th>
+            <th>Issue Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for issue in issued_books %}
+          <tr>
+            <td>{{ issue.id }}</td>
+            <td>{{ issue.member.name }}</td>
+            <td>{{ issue.book.title }}</td>
+            <td>{{ issue.issue_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ issue.status }}</td>
+            <td>
+              {% if issue.status == 'Issued' %}
+              <a class="btn" href="{{ url_for('return_book', issue_id=issue.id) }}">Return</a>
+              {% else %}
+              Returned
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
